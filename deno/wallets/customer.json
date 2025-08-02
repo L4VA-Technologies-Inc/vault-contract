@@ -1,0 +1,20 @@
+{
+  "stake_skey": "ed25519e_sk12pfjqyw7dv0ywhwj2unjnme8jck7y99gvtpu2l3mwh47rrktwdrdsmnfr3dy4d7uypr2vkvm3cstxfhdl7pwtj7pnkzkn03dq5qp56qsmgzsc",
+  "stake_skey_hex": "50532011de6b1e475dd2572729ef27962de214a862c3c57e3b75ebe18ecb7346d86e691c5a4ab7dc2046a6599b8e20b326edff82e5cbc19d8569be2d05001a68",
+  "skey": "ed25519e_sk1xq4ctcuj54zcyuu6k45key7nh8w8u26485knzgktyl3p8yxtwdr0t8u7gje4dukzmf7ryk4s35zrw5e8ysvj5rv48kq6yyryg9gqx5ccxjs2p",
+  "skey_hex": "302b85e392a54582739ab5696c93d3b9dc7e2b553d2d3122cb27e21390cb7346f59f9e44b356f2c2da7c325ab08d0437532724192a0d953d81a2106441500353",
+  "pkey": "ed25519_pk1hmxpszdkdnqv07dezpc54xhjar6d2sjxq375u2hcdskn8xd5v36q8jtq89",
+  "pkey_hex": "becc1809b66cc0c7f9b910714a9af2e8f4d54246047d4e2af86c2d3399b46474",
+  "key_hash": "4c1e8e902d5ccd4fda9336cb0cfcbcc69fa33a4f57217edce49d1dc6",
+  "stake_key_hash": "3bb3fbf9f615a85621d8000c6cdb87fbc3890a6ff75d1da867291aff",
+  "base_address_preview": "addr_test1qpxpar5s94wv6n76jvmvkr8uhnrflge6fatjzlkuujw3m33mk0alnas44ptzrkqqp3kdhplmcwys5mlht5w6seefrtls2r748e",
+  "base_address_preprod": "addr_test1qpxpar5s94wv6n76jvmvkr8uhnrflge6fatjzlkuujw3m33mk0alnas44ptzrkqqp3kdhplmcwys5mlht5w6seefrtls2r748e",
+  "base_address_mainnet": "addr1q9xpar5s94wv6n76jvmvkr8uhnrflge6fatjzlkuujw3m33mk0alnas44ptzrkqqp3kdhplmcwys5mlht5w6seefrtlsf4r4tx",
+  "enterprise_address_mainnet": "addr1v9xpar5s94wv6n76jvmvkr8uhnrflge6fatjzlkuujw3m3s640rq7",
+  "enterprise_address_preview": "addr_test1vpxpar5s94wv6n76jvmvkr8uhnrflge6fatjzlkuujw3m3spaml0m",
+  "enterprise_address_preprod": "addr_test1vpxpar5s94wv6n76jvmvkr8uhnrflge6fatjzlkuujw3m3spaml0m",
+  "reward_address_mainnet": "stake1uyam87le7c26s43pmqqqcmxmslau8zg2dlm468dgvu534lc5mltkf",
+  "reward_address_preview": "stake_test1uqam87le7c26s43pmqqqcmxmslau8zg2dlm468dgvu534lcn34fj5",
+  "reward_address_preprod": "stake_test1uqam87le7c26s43pmqqqcmxmslau8zg2dlm468dgvu534lcn34fj5",
+  "mnemonic": "garbage suffer couch lamp mask salon clean allow option treat fame gold goose service capital amateur session electric text plate hint aerobic under buddy"
+}

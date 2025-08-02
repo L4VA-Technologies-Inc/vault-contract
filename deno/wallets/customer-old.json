@@ -1,0 +1,17 @@
+{
+  "skey": "ed25519e_sk1kpv0mk8d7ltzyv476dgku49dv72fkxtk763zhc58n4j4lvsd592m33equs7k7mfjlyqwmgtckchfkdz2w5j5vdaku3vfyfflsuyy2gs9ypdq2",
+  "skey_hex": "b058fdd8edf7d62232bed3516e54ad67949b1976f6a22be2879d655fb20da155b8c720e43d6f6d32f900eda178b62e9b344a75254637b6e45892253f87084522",
+  "pkey": "ed25519_pk1g5d9e7czapehftyt322de9fuan8z0n0z5ullg6pr57x9eqt5ryvqae4uf9",
+  "pkey_hex": "451a5cfb02e87374ac8b8a94dc953cecce27cde2a73ff46823a78c5c81741918",
+  "key_hash": "ccac511276dcf17f359a3e521038ed7611171877260cc2e905c0d692",
+  "base_address_preview": "addr_test1qrx2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddy5p9et633htthpeffw4995u7khyug3j90c22hwrgwcg8c6sksutuj",
+  "base_address_preprod": "addr_test1qrx2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddy5p9et633htthpeffw4995u7khyug3j90c22hwrgwcg8c6sksutuj",
+  "base_address_mainnet": "addr1q8x2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddy5p9et633htthpeffw4995u7khyug3j90c22hwrgwcg8c6s4xptsd",
+  "enterprise_address_mainnet": "addr1v8x2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddyscl33c5",
+  "enterprise_address_preview": "addr_test1vrx2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddysrh9dh3",
+  "enterprise_address_preprod": "addr_test1vrx2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddysrh9dh3",
+  "reward_address_mainnet": "stake1uxqju4agcm44msu55h2jj6w0ttjwygezhu99thp58vyrudgmsp9lf",
+  "reward_address_preview": "stake_test1uzqju4agcm44msu55h2jj6w0ttjwygezhu99thp58vyrudgu6t8m5",
+  "reward_address_preprod": "stake_test1uzqju4agcm44msu55h2jj6w0ttjwygezhu99thp58vyrudgu6t8m5",
+  "mnemonic": "noble crisp give virtual aspect become test happy swap ladder knife blue"
+}

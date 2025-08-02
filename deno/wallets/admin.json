@@ -1,0 +1,17 @@
+{
+  "skey": "ed25519e_sk1hq320jc6lavvm37tjygfm5pfwwfv0dz3sjrdw8y7h0f6evcecd2lf7fhlu504qsedee7y0hw8ecqxwz6emjyav68x5rra6stg3r4j7gvd6403",
+  "skey_hex": "b822a7cb1aff58cdc7cb91109dd0297392c7b4518486d71c9ebbd3acb319c355f4f937ff28fa82196e73e23eee3e7003385acee44eb34735063eea0b44475979",
+  "pkey": "ed25519_pk1ueteaa65ygf6tnu0efj4pzm9nk3c3qr4k04wepx74xuzdvx0tvtswwf36y",
+  "pkey_hex": "e6579ef7542213a5cf8fca65508b659da3888075b3eaec84dea9b826b0cf5b17",
+  "key_hash": "ddd93c8dde5756752986fec0dc6fc8a688006786f201a40c3b50a3c3",
+  "base_address_preview": "addr_test1qrwaj0ydmet4vaffsmlvphr0ezngsqr8smeqrfqv8dg28s6a7lef2sgsndl8srczz5pukmqvjyxhp367877w7xlxp08sap77vr",
+  "base_address_preprod": "addr_test1qrwaj0ydmet4vaffsmlvphr0ezngsqr8smeqrfqv8dg28s6a7lef2sgsndl8srczz5pukmqvjyxhp367877w7xlxp08sap77vr",
+  "base_address_mainnet": "addr1q8waj0ydmet4vaffsmlvphr0ezngsqr8smeqrfqv8dg28s6a7lef2sgsndl8srczz5pukmqvjyxhp367877w7xlxp08s7hr7qu",
+  "enterprise_address_mainnet": "addr1v8waj0ydmet4vaffsmlvphr0ezngsqr8smeqrfqv8dg28scjecskd",
+  "enterprise_address_preview": "addr_test1vrwaj0ydmet4vaffsmlvphr0ezngsqr8smeqrfqv8dg28scf3vveg",
+  "enterprise_address_preprod": "addr_test1vrwaj0ydmet4vaffsmlvphr0ezngsqr8smeqrfqv8dg28scf3vveg",
+  "reward_address_mainnet": "stake1u9wl0u54gygfklncpupp2q7tdsxfzrtsca0rl080r0nqhnck2a08d",
+  "reward_address_preview": "stake_test1upwl0u54gygfklncpupp2q7tdsxfzrtsca0rl080r0nqhnc3qhdrs",
+  "reward_address_preprod": "stake_test1upwl0u54gygfklncpupp2q7tdsxfzrtsca0rl080r0nqhnc3qhdrs",
+  "mnemonic": "fall coyote street waste price unusual boat stairs man can pipe crumble"
+}

@@ -19,7 +19,7 @@ import {
 import customer from "../wallets/customer.json";
 // 1 wallet = admin.json
 import admin from "../wallets/admin.json";
-import type { Datum } from "../type.ts";
+import type { Datum, Redeemer } from "../type.ts";
 import { toPreloadedScript, applyContributeParams } from "../apply_params.ts";
 import blueprint from "../blueprint.json";
 const X_API_KEY = "testnet_4Y4K4wORt4fK5TQyHeoRiqAvw7DFeuAzayhlvtG5";
@@ -67,7 +67,7 @@ const index = async () => {
   if (!unparameterizedScript) {
     throw new Error("Contribute validator not found");
   }
-  const lpsUnit = parameterizedScript.validator.hash + VAULT_ID; 
+  const lpsUnit = parameterizedScript.validator.hash + VAULT_ID;
   //Find the lps on the utxo to collect
   const [tx_hash, index] = TX_HASH_INDEX_WITH_LPS_TO_COLLECT.split("#");
   const txUtxos = await blockfrost.txsUtxos(tx_hash);
@@ -80,7 +80,7 @@ const index = async () => {
   );
   const datumTag = generate_tag_from_txhash_index(tx_hash, Number(index));
   if (!amountOfLpsToClaim) {
-    console.log(JSON.stringify(output))
+    console.log(JSON.stringify(output));
     throw new Error("No lps to claim.");
   }
   const input: {
@@ -121,6 +121,32 @@ const index = async () => {
           value: { vault_token_output_index: 0, change_output_index: 1 },
         },
       },
+      {
+        purpose: "mint",
+        hash: POLICY_ID,
+        redeemer: {
+          type: "json",
+          value: "MintVaultToken" satisfies Redeemer,
+        },
+      },
+    ],
+    mint: [
+      {
+        version: "cip25",
+        assetName: { name: VAULT_ID, format: "hex" },
+        policyId: POLICY_ID,
+        type: "plutus",
+        quantity: 5,
+        metadata: {},
+      },
+      {
+        version: "cip25",
+        assetName: { name: "receipt", format: "utf8" },
+        policyId: POLICY_ID,
+        type: "plutus",
+        quantity: -1,
+        metadata: {},
+      },
     ],
     outputs: [
       {
@@ -144,7 +170,7 @@ const index = async () => {
           type: "inline",
           value: {
             policy_id: POLICY_ID,
-            asset_name: VAULT_ID, 
+            asset_name: VAULT_ID,
             owner: CUSTOMER_ADDRESS,
           },
           shape: {
@@ -173,7 +199,7 @@ const index = async () => {
     network: "preprod",
   };
 
-  const inputWithNoPreloaded = {...input}
+  const inputWithNoPreloaded = { ...input };
   //@ts-ignore
   delete inputWithNoPreloaded.preloadedScripts;
   console.log(JSON.stringify(inputWithNoPreloaded));

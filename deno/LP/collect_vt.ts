@@ -19,7 +19,7 @@ import {
 import customer from "../wallets/customer.json";
 // 1 wallet = admin.json
 import admin from "../wallets/admin.json";
-import type { Datum, Redeemer } from "../type.ts";
+import type { Datum, Redeemer, Redeemer1 } from "../type.ts";
 import { toPreloadedScript, applyContributeParams } from "../apply_params.ts";
 import blueprint from "../blueprint.json";
 const X_API_KEY = "testnet_4Y4K4wORt4fK5TQyHeoRiqAvw7DFeuAzayhlvtG5";
@@ -36,13 +36,12 @@ const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private k
 const VAULT_POLICY_ID =
   "d4915ac1dd9ef95493351cfaa2a6c9a85086472f12523999b5e32aeb";
 const VAULT_ID =
-  "d18912e96a3196e26be360f5ecf3496a5a0d65978a4794182717059c227215b9"; // The vault ID, used to identify the vault in the smart contract.
+  "65ad08cea14a4075f963d54142c9673ada4e6aae6e94eeef3ab185d4fd434992";
 const LAST_UPDATE_TX_HASH =
-  "e3ec1002af0d332abd907e6d57b63c3f51a20b7556f30cd1042774affeee6308";
-const LAST_UPDATE_TX_INDEX = 0; // The index off the output in the transaction
-
+  "e3ca727df0b97b709f71ecad23ded7fc7e52bfa4f32cb43c40bdb6d99db69443";
+const LAST_UPDATE_TX_INDEX = 0;
 const TX_HASH_INDEX_WITH_LPS_TO_COLLECT =
-  "2d7e7feb0584d309a4e2558d1cde6179c2eede9c42fd28e62899c6a79d81e9bd#0";
+  "c492effa1138604371fd9e2af0943092274bb1077dc36742020cee5329a05a2a#0";
 const index = async () => {
   const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
   if (utxos.length === 0) {
@@ -67,7 +66,7 @@ const index = async () => {
   if (!unparameterizedScript) {
     throw new Error("Contribute validator not found");
   }
-  const lpsUnit = parameterizedScript.validator.hash + VAULT_ID;
+  const lpsUnit = parameterizedScript.validator.hash + "72656365697074";
   //Find the lps on the utxo to collect
   const [tx_hash, index] = TX_HASH_INDEX_WITH_LPS_TO_COLLECT.split("#");
   const txUtxos = await blockfrost.txsUtxos(tx_hash);
@@ -118,7 +117,13 @@ const index = async () => {
         },
         redeemer: {
           type: "json",
-          value: { vault_token_output_index: 0, change_output_index: 1 },
+          value: {
+            __variant: "CollectVaultToken",
+            __data: {
+              vault_token_output_index: 0,
+              change_output_index: 1,
+            },
+          },
         },
       },
       {
@@ -136,7 +141,7 @@ const index = async () => {
         assetName: { name: VAULT_ID, format: "hex" },
         policyId: POLICY_ID,
         type: "plutus",
-        quantity: 5,
+        quantity: 4375000000000000,
         metadata: {},
       },
       {
@@ -155,7 +160,7 @@ const index = async () => {
           {
             assetName: { name: VAULT_ID, format: "hex" },
             policyId: parameterizedScript.validator.hash,
-            quantity: 1000,
+            quantity: 4375000000000000,
           },
         ],
         datum: {
@@ -165,7 +170,7 @@ const index = async () => {
       },
       {
         address: SC_ADDRESS,
-        lovelace: 10000000,
+        lovelace: 50000000,
         datum: {
           type: "inline",
           value: {

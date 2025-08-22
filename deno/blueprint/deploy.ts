@@ -91,7 +91,7 @@ const linkBlueprintAndTxHash = await fetch(`${API_ENDPOINT}/blueprints`, {
     blueprint,
     refs: getValidators(blueprint.validators).reduce(
       (a, b, index) => {
-        a[b.hash] = { txHash, index };
+        a[b.hash] = { txHash, index: 0 };
         return a;
       },
       {} as Record<string, { txHash: string; index: number }>,

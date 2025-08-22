@@ -1,8 +1,5 @@
 import { Buffer } from "node:buffer";
-import {
-  Credential,
-  EnterpriseAddress,
-  ScriptHash,
+import { 
   Address,
   FixedTransaction,
   PrivateKey,
@@ -19,9 +16,7 @@ import {
 import customer from "../wallets/customer.json";
 // 1 wallet = admin.json
 import admin from "../wallets/admin.json";
-import type { Datum, Redeemer, Redeemer1 } from "../type.ts";
-import { toPreloadedScript, applyContributeParams } from "../apply_params.ts";
-import blueprint from "../blueprint.json";
+import type { Datum, Redeemer, Redeemer1 } from "../type.ts"; 
 const X_API_KEY = "testnet_4Y4K4wORt4fK5TQyHeoRiqAvw7DFeuAzayhlvtG5";
 const API_ENDPOINT = "https://preprod.api.ada-anvil.app/v2/services";
 
@@ -33,8 +28,7 @@ const headers = {
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
 const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
 
-const VAULT_POLICY_ID =
-  "d4915ac1dd9ef95493351cfaa2a6c9a85086472f12523999b5e32aeb";
+const CONTRIBUTION_SCRIPT_HASH = "9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2";
   const VAULT_ID =
   "d18912e96a3196e26be360f5ecf3496a5a0d65978a4794182717059c227215b9"; // The vault ID, used to identify the vault in the smart contract.
 const LAST_UPDATE_TX_HASH =
@@ -47,20 +41,9 @@ const index = async () => {
   const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
  
 
-  const parameterizedScript = applyContributeParams({
-    vault_policy_id: VAULT_POLICY_ID,
-    vault_id: VAULT_ID,
-  });
-  const POLICY_ID = parameterizedScript.validator.hash;
-
-  const unparameterizedScript = blueprint.validators.find(
-    (v) => v.title === "contribute.contribute"
-  );
-  if (!unparameterizedScript) {
-    throw new Error("Contribute validator not found");
-  }
-  const lpsUnit = parameterizedScript.validator.hash + "72656365697074";
-  //Find the lps on the utxo to collect
+  const POLICY_ID = CONTRIBUTION_SCRIPT_HASH;
+  const lpsUnit = CONTRIBUTION_SCRIPT_HASH + "72656365697074";
+  // Find the receipt token on the UTXO to extract assets from
   const [tx_hash, index] = TX_HASH_INDEX_WITH_LPS_TO_COLLECT.split("#");
   const txUtxos = await blockfrost.txsUtxos(tx_hash);
   const output = txUtxos.outputs[index];
@@ -88,10 +71,6 @@ const index = async () => {
       datum?: { type: "inline"; value: string | Datum; shape?: object };
     }[];
     requiredSigners: string[];
-    preloadedScripts: {
-      type: string;
-      blueprint: any;
-    }[];
     referenceInputs: { txHash: string; index: number }[];
     validityInterval: {
       start: boolean;
@@ -153,7 +132,7 @@ const index = async () => {
         assets: [
           {
             assetName: { name: VAULT_ID, format: "hex" },
-            policyId: parameterizedScript.validator.hash,
+            policyId: CONTRIBUTION_SCRIPT_HASH,
             quantity: 5,
           },
         ],
@@ -162,11 +141,6 @@ const index = async () => {
           value: PlutusData.new_bytes(Buffer.from(datumTag, "hex")).to_hex(),
         },
       },
-    ],
-    preloadedScripts: [
-      toPreloadedScript(blueprint, {
-        validators: [parameterizedScript.validator, unparameterizedScript],
-      }),
     ],
     requiredSigners: [ADMIN_KEY_HASH],
     referenceInputs: [
@@ -182,10 +156,7 @@ const index = async () => {
     network: "preprod",
   };
 
-  const inputWithNoPreloaded = { ...input };
-  //@ts-ignore
-  delete inputWithNoPreloaded.preloadedScripts;
-  console.log(JSON.stringify(inputWithNoPreloaded));
+  console.log(JSON.stringify(input));
 
   const contractDeployed = await fetch(`${API_ENDPOINT}/transactions/build`, {
     method: "POST",

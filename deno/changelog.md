@@ -66,4 +66,25 @@ Represents the current status of the vault.
   * You already minted 1 token on contribution
   * At collection: **must remint 999,999 vault tokens**
 
- 
+---
+
+## August 22, 2025 - Script Deployment & Architecture Change
+
+### Breaking Changes for Developers
+
+**1. Vault Creation (`create_vault.ts`)**
+- Now deploys the contribution script on-chain during vault creation
+- Script is uploaded to `/blueprints` endpoint and referenced in transactions
+- No more runtime script parameterization needed
+
+**2. All LP Scripts (Liquidity Provider Examples)**
+- **Remove** all `applyContributeParams()` function calls
+- **Remove** `preloadedScripts` arrays from transaction building
+- Scripts now reference the deployed contribution script hash directly
+- Update your LP scripts to follow the new pattern shown in the examples
+
+### Migration Guide:
+1. Use updated `create_vault.ts` to deploy scripts on-chain first
+2. Update your LP scripts by removing the `applyContributeParams` pattern
+3. Reference the deployed script hash instead of building scripts at runtime
+* Cleaner, more maintainable codebase with minimal dependencies

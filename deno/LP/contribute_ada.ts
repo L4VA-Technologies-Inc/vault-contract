@@ -14,9 +14,7 @@ import { getUtxos } from "../lib-js.ts";
 import customer from "../wallets/customer.json";
 // 1 wallet = admin.json
 import admin from "../wallets/admin.json";
-import type { Datum, Redeemer } from "../type.ts";
-import { toPreloadedScript, applyContributeParams } from "../apply_params.ts";
-import blueprint from "../blueprint.json";
+import type { Datum, Redeemer } from "../type.ts"; 
 const X_API_KEY = "testnet_4Y4K4wORt4fK5TQyHeoRiqAvw7DFeuAzayhlvtG5";
 const API_ENDPOINT = "https://preprod.api.ada-anvil.app/v2/services";
 
@@ -28,10 +26,8 @@ const headers = {
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
 const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
 
-const VAULT_POLICY_ID =
-  "d4915ac1dd9ef95493351cfaa2a6c9a85086472f12523999b5e32aeb";
-  const VAULT_ID =
-  "e82ad43222718252725d83a2a8065cd6c59eaab618c8a248ff8a0c357c04b74a"; // The vault ID, used to identify the vault in the smart contract.
+const CONTRIBUTION_SCRIPT_HASH = "9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2";
+const VAULT_ID = "e82ad43222718252725d83a2a8065cd6c59eaab618c8a248ff8a0c357c04b74a";
 const LAST_UPDATE_TX_HASH =
   "8d2f016aa13d1a7cb52e70a16b374216044cef4f71acb6fbd38a90f9b52b2b77";
 const LAST_UPDATE_TX_INDEX = 0; // The index off the output in the transaction
@@ -41,24 +37,13 @@ const index = async () => {
     throw new Error("No UTXOs found.");
   }
 
-  const parameterizedScript = applyContributeParams({
-    vault_policy_id: VAULT_POLICY_ID,
-    vault_id: VAULT_ID,
-  });
-  const POLICY_ID = parameterizedScript.validator.hash;
+  const POLICY_ID = CONTRIBUTION_SCRIPT_HASH;
   const SC_ADDRESS = EnterpriseAddress.new(
     0,
     Credential.from_scripthash(ScriptHash.from_hex(POLICY_ID))
   )
     .to_address()
     .to_bech32();
-
-  const unparameterizedScript = blueprint.validators.find(
-    (v) => v.title === "contribute.contribute"
-  );
-  if (!unparameterizedScript) {
-    throw new Error("Contribute validator not found");
-  }
   const input: {
     changeAddress: string;
     message: string;
@@ -71,10 +56,6 @@ const index = async () => {
       datum: { type: "inline"; value: Datum; shape: object };
     }[];
     requiredSigners: string[];
-    preloadedScripts?: {
-      type: string;
-      blueprint: any;
-    }[];
     referenceInputs: { txHash: string; index: number }[];
     validityInterval: {
       start: boolean;
@@ -131,11 +112,6 @@ const index = async () => {
           },
         },
       },
-    ],
-    preloadedScripts: [
-      toPreloadedScript(blueprint, {
-        validators: [parameterizedScript.validator, unparameterizedScript],
-      }),
     ],
     requiredSigners: [ADMIN_KEY_HASH],
     referenceInputs: [

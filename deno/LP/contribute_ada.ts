@@ -26,10 +26,10 @@ const headers = {
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
 const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
 
-const CONTRIBUTION_SCRIPT_HASH = "9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2";
-const VAULT_ID = "e82ad43222718252725d83a2a8065cd6c59eaab618c8a248ff8a0c357c04b74a";
+const CONTRIBUTION_SCRIPT_HASH = "a8a0a77ac72610ef364ebf64c5a6101440ffb7ce863f4c47c88eba26";
+const VAULT_ID = "d5a599c878766b21b8ac4037cf26a3c8223830aa77a130828c9beb7fb235f68d";
 const LAST_UPDATE_TX_HASH =
-  "8d2f016aa13d1a7cb52e70a16b374216044cef4f71acb6fbd38a90f9b52b2b77";
+  "7e7e31664d1dd4a596c600a5b263d161ad9d205c6a81b2ba502671784d3a4e8e";
 const LAST_UPDATE_TX_INDEX = 0; // The index off the output in the transaction
 const index = async () => {
   const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.

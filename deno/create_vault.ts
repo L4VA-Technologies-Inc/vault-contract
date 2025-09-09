@@ -61,7 +61,8 @@ const assetName = generate_tag_from_txhash_index(
 const applyParamsPayload = {
   "params": {
     //9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2 contribution script hash
-    "9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2": [
+    //0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89 contribution script with verbose
+    "0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89": [
       POLICY_ID, // policy id of the vault
       assetName  // newly created vault id from generate_tag_from_txhash_index
     ]
@@ -114,9 +115,11 @@ const scriptHash = applyParamsResult.preloadedScript.blueprint.validators.find((
 if(!scriptHash) {
   throw new Error("Failed to find script hash");
 }
-console.log(`Script uploaded with hash: ${scriptHash}`);
+console.log(`Script hash found: ${scriptHash}`);
 
-const input: {
+// TRANSACTION 1: Create vault (normal process without script upload)
+console.log("\n=== TRANSACTION 1: Creating Vault ===");
+const vaultInput: {
   changeAddress: string;
   message: string;
   mint: Array<object>;
@@ -125,14 +128,11 @@ const input: {
     address: string;
     assets: object[];
     datum: { type: "inline"; value: Datum1; shape: object };
-  } | {
-    address: string;
-    datum: { type: "script"; hash: string };
   })[];
   requiredInputs: string[];
 } = {
   changeAddress: CUSTOMER_ADDRESS,
-  message: "Vault",
+  message: "Vault Creation",
   mint: [
     {
       version: "cip25",
@@ -207,10 +207,7 @@ const input: {
             // [
             //   PlutusData.new_bytes(Buffer.from("foo")).to_hex(),
             //   PlutusData.new_bytes(Buffer.from("bar")).to_hex(),
-            // ],
-            [toHex("foo"), toHex("bar")],
-            [toHex("bar"), toHex("foo")],
-            [toHex("inc"), toHex("1")],
+            // ], 
           ], // like a tuple
 
           // termination: {
@@ -230,90 +227,147 @@ const input: {
         },
       },
     },
-    // Step 3: Add output with script hash to user wallet for testing
-    {
-      address: "addr_test1qrx2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddy5p9et633htthpeffw4995u7khyug3j90c22hwrgwcg8c6sksutuj",
-      datum: {
-        type: "script",
-        hash: scriptHash,
-      },
-    },
   ],
   requiredInputs: REQUIRED_INPUTS,
 };
 
-console.log(JSON.stringify(input, null, 2));
-
-const contractDeployed = await fetch(`${API_ENDPOINT}/transactions/build`, {
+console.log("Vault transaction input:", JSON.stringify(vaultInput, null, 2)); 
+const vaultTransaction = await fetch(`${API_ENDPOINT}/transactions/build`, {
   method: "POST",
   headers,
-  body: JSON.stringify(input),
+  body: JSON.stringify(vaultInput),
 });
 
-const transaction = await contractDeployed.json();
-console.log(JSON.stringify(transaction));
+const vaultTxResult = await vaultTransaction.json();
+console.log("Vault transaction result:", JSON.stringify(vaultTxResult, null, 2));
 
-// Sign the transaction using CSL.
-const txToSubmitOnChain = FixedTransaction.from_bytes(
-  Buffer.from(transaction.complete, "hex"),
+// Sign the vault transaction using CSL.
+const vaultTxToSubmit = FixedTransaction.from_bytes(
+  Buffer.from(vaultTxResult.complete, "hex"),
 );
-txToSubmitOnChain.sign_and_add_vkey_signature(
+vaultTxToSubmit.sign_and_add_vkey_signature(
   PrivateKey.from_bech32(customer.skey),
 );
 
+await sleep(30000);
+
 const urlSubmit = `${API_ENDPOINT}/transactions/submit`;
-const submitted = await fetch(urlSubmit, {
+const vaultSubmitted = await fetch(urlSubmit, {
   method: "POST",
   headers,
   body: JSON.stringify({
-    signatures: [], // no signature required as it is part of the `txToSubmitOnChain`.
-    transaction: txToSubmitOnChain.to_hex(),
+    signatures: [], // no signature required as it is part of the `vaultTxToSubmit`.
+    transaction: vaultTxToSubmit.to_hex(),
   }),
 });
 
-const output = await submitted.json();
-console.debug(output);
+const vaultOutput = await vaultSubmitted.json();
+console.log("Vault submission result:", vaultOutput);
 
-// Get the transaction hash for blueprint update
-const { txHash } = output;
+// Get the transaction hash for vault creation
+const { txHash: vaultTxHash } = vaultOutput;
 
-if (txHash) {
-  console.log("✅ Vault and script created successfully in single transaction!");
+if (vaultTxHash) {
+  console.log("✅ Vault created successfully!");
   console.log(`Vault ID: ${assetName}`);
-  console.log(`Transaction Hash: ${txHash}`);
+  console.log(`Vault Transaction Hash: ${vaultTxHash}`);
 
-  // Step 4: Update blueprint with the script transaction reference
-  const blueprintUpdatePayload = {
-    blueprint: {
-      ...applyParamsResult.preloadedScript.blueprint,
-      preamble: {
-        ...applyParamsResult.preloadedScript.blueprint.preamble,
-        id: undefined,
-        title: "l4va/vault/" + assetName,
-        version: "0.0.1",
+  // TRANSACTION 2: Upload script to chain
+  console.log("\n=== TRANSACTION 2: Uploading Script to Chain ===");
+  
+  const scriptInput = {
+    changeAddress: CUSTOMER_ADDRESS,
+    message: "Script Upload",
+    outputs: [
+      {
+        address: "addr_test1qrx2c5gjwmw0zle4ngl9yypca4mpz9ccwunqeshfqhqddy5p9et633htthpeffw4995u7khyug3j90c22hwrgwcg8c6sksutuj",
+        datum: {
+          type: "script",
+          hash: scriptHash,
+        },
       },
-      validators: applyParamsResult.preloadedScript.blueprint.validators.filter((v:any) => v.title.includes("contribute")),
-    },
-    refs: {
-      [scriptHash]: {
-        txHash: txHash,
-        index: 1 // Script output is at index 1 (vault is at index 0)
-      }
-    }
+    ],
   };
 
-  console.log("Updating blueprint with script reference...");
-  const blueprintUpdate = await fetch(`${API_ENDPOINT}/blueprints`, {
+  console.log("Script transaction input:", JSON.stringify(scriptInput, null, 2));
+
+  const scriptTransaction = await fetch(`${API_ENDPOINT}/transactions/build`, {
     method: "POST",
     headers,
-    body: JSON.stringify(blueprintUpdatePayload),
+    body: JSON.stringify(scriptInput),
   });
 
-  const blueprintUpdateResult = await blueprintUpdate.json();
- 
-  console.log("✅ Complete workflow finished: vault created, script uploaded, and blueprint updated!");
-  console.log("Newly script hash to use for contribution: " + scriptHash);
-  console.log("Newly vault id to use for contribution: " + assetName);
+  const scriptTxResult = await scriptTransaction.json();
+  console.log("Script transaction result:", JSON.stringify(scriptTxResult, null, 2));
+
+  // Sign the script transaction using CSL.
+  const scriptTxToSubmit = FixedTransaction.from_bytes(
+    Buffer.from(scriptTxResult.complete, "hex"),
+  );
+  scriptTxToSubmit.sign_and_add_vkey_signature(
+    PrivateKey.from_bech32(customer.skey),
+  );
+  await sleep(30000);
+  const scriptSubmitted = await fetch(urlSubmit, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      signatures: [], // no signature required as it is part of the `scriptTxToSubmit`.
+      transaction: scriptTxToSubmit.to_hex(),
+    }),
+  });
+
+  const scriptOutput = await scriptSubmitted.json();
+  console.log("Script submission result:", scriptOutput);
+
+  // Get the transaction hash for script upload
+  const { txHash: scriptTxHash } = scriptOutput;
+
+  if (scriptTxHash) {
+    console.log("✅ Script uploaded successfully!");
+    console.log(`Script Transaction Hash: ${scriptTxHash}`);
+
+    // Step 3: Update blueprint with the script transaction reference
+    const blueprintUpdatePayload = {
+      blueprint: {
+        ...applyParamsResult.preloadedScript.blueprint,
+        preamble: {
+          ...applyParamsResult.preloadedScript.blueprint.preamble,
+          id: undefined,
+          title: "l4va/vault/" + assetName,
+          version: "0.0.1",
+        },
+        validators: applyParamsResult.preloadedScript.blueprint.validators.filter((v:any) => v.title.includes("contribute")),
+      },
+      refs: {
+        [scriptHash]: {
+          txHash: scriptTxHash,
+          index: 0 // Script output is at index 0
+        }
+      }
+    };
+
+    console.log("Updating blueprint with script reference...");
+    const blueprintUpdate = await fetch(`${API_ENDPOINT}/blueprints`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(blueprintUpdatePayload),
+    });
+
+    const blueprintUpdateResult = await blueprintUpdate.json();
+    console.log("Blueprint update result:", JSON.stringify(blueprintUpdateResult, null, 2));
+   
+    console.log("✅ Complete two-transaction workflow finished!");
+    console.log(`Vault created with ID: ${assetName} (tx: ${vaultTxHash})`);
+    console.log(`Script uploaded with hash: ${scriptHash} (tx: ${scriptTxHash})`);
+    console.log("Blueprint updated with script reference");
+  } else {
+    console.error("Failed to upload script to chain");
+  }
 } else {
-  console.error("Failed to create vault and upload script");
+  console.error("Failed to create vault");
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

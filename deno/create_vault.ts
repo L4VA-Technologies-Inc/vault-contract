@@ -56,13 +56,14 @@ const assetName = generate_tag_from_txhash_index(
   selectedUtxo.input().transaction_id().to_hex(),
   selectedUtxo.input().index(),
 );
+//9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2 contribution script hash
+//0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89 contribution script with verbose
+const unparametizedScriptHash = "0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89"
 
 // Apply parameters to the blueprint before building the transaction
 const applyParamsPayload = {
   "params": {
-    //9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2 contribution script hash
-    //0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89 contribution script with verbose
-    "0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89": [
+    [unparametizedScriptHash]: [
       POLICY_ID, // policy id of the vault
       assetName  // newly created vault id from generate_tag_from_txhash_index
     ]
@@ -102,7 +103,7 @@ const uploadScriptResponse = await fetch(`${API_ENDPOINT}/blueprints`, {
         title: "l4va/vault/" + assetName,
         version: "0.0.1",
       },
-      validators: applyParamsResult.preloadedScript.blueprint.validators.filter((v:any) => v.title.includes("contribute")),
+      validators: applyParamsResult.preloadedScript.blueprint.validators.filter((v: any) => v.title.includes("contribute") && v.hash !== unparametizedScriptHash),
     }
   }),
 });
@@ -111,8 +112,8 @@ const uploadScriptResult = await uploadScriptResponse.json();
 console.log("Script upload result:", JSON.stringify(uploadScriptResult, null, 2));
 
 
-const scriptHash = applyParamsResult.preloadedScript.blueprint.validators.find((v:any) => v.title === "contribute.contribute.mint")?.hash || "";
-if(!scriptHash) {
+const scriptHash = applyParamsResult.preloadedScript.blueprint.validators.find((v: any) => v.title === "contribute.contribute.mint" && v.hash !== unparametizedScriptHash)?.hash || "";
+if (!scriptHash) {
   throw new Error("Failed to find script hash");
 }
 console.log(`Script hash found: ${scriptHash}`);
@@ -337,7 +338,7 @@ if (vaultTxHash) {
           title: "l4va/vault/" + assetName,
           version: "0.0.1",
         },
-        validators: applyParamsResult.preloadedScript.blueprint.validators.filter((v:any) => v.title.includes("contribute")),
+        validators: applyParamsResult.preloadedScript.blueprint.validators.filter((v: any) => v.title.includes("contribute")),
       },
       refs: {
         [scriptHash]: {

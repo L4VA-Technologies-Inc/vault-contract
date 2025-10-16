@@ -8,7 +8,7 @@ const headers = {
 };
 
 const getBlueprint = await fetch(
-  `${API_ENDPOINT}/blueprints?title=l4va/vault&version=0.0.7`,
+  `${API_ENDPOINT}/blueprints?title=l4va/vault-with-dispatch&version=0.1.1`,
   {
     method: "GET",
     headers,

@@ -1,5 +1,5 @@
-name = "l4va/vault"
-version = "0.0.7"
+name = "l4va/vault-with-dispatch"
+version = "0.1.1"
 compiler = "v1.1.10"
 plutus = "v3"
 license = "Apache-2.0"

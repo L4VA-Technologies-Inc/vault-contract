@@ -10,6 +10,7 @@ use constant.{receipt_tag}
 use datum.{find_datum}
 use inputs.{mint_total}
 use interval.{is_after_window, is_within_window}
+use multiplier.{loop_throught_assets}
 use outputs.{
   change_match_the_input, owner_is_refunded_with_correct_datum,
   vt_on_output_with_correct_datum_and_owner,
@@ -188,6 +189,7 @@ validator contribute(vault_policy: PolicyId, vault_id: ByteArray) {
               datum,
               own_ref,
               vault.acquire_multiplier,
+              None,
             )
 
           and {
@@ -223,6 +225,7 @@ validator contribute(vault_policy: PolicyId, vault_id: ByteArray) {
               datum,
               own_ref,
               vault.acquire_multiplier,
+              None,
             )
 
           and {
@@ -236,6 +239,30 @@ validator contribute(vault_policy: PolicyId, vault_id: ByteArray) {
         //Take only the LPs from the input
         expect Some(output) = self.outputs |> at(vault_token_output_index)
         expect Some(change_output) = self.outputs |> at(change_output_index)
+        // Validate ada_distribution if set and vault is successful
+        let ada_distribution =
+          when vault.ada_distribution is {
+            Some(ada_distribution) -> {
+              let vault_successful = vault.vault_status == 2
+              if vault_successful {
+                // Compute expected payout using existing loop_throught_assets function
+                let input_assets =
+                  input.output.value |> without_lovelace |> flatten
+                let expected_payout_ada =
+                  loop_throught_assets(Some(ada_distribution), input_assets, 0)
+                if expected_payout_ada == 0 {
+                  None
+                } else {
+                  expect
+                    ( output.value |> quantity_of(#"", #"") ) >= expected_payout_ada
+                  Some(expected_payout_ada)
+                }
+              } else {
+                None
+              }
+            }
+            None -> None
+          }
         let lp_are_paid =
           vt_on_output_with_correct_datum_and_owner(
             self,
@@ -244,6 +271,7 @@ validator contribute(vault_policy: PolicyId, vault_id: ByteArray) {
             datum,
             own_ref,
             vault.acquire_multiplier,
+            ada_distribution,
           )
 
         //Check that the change is sent back to the output with the same datum

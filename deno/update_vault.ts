@@ -30,8 +30,8 @@ const CUSTOMER_ADDRESS = customer.base_address_preprod;
 const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
 
 const VAULT_ID =
-  "d18912e96a3196e26be360f5ecf3496a5a0d65978a4794182717059c227215b9"; // Represented by the assetname minted using mod.ts.
-const POLICY_ID = "d4915ac1dd9ef95493351cfaa2a6c9a85086472f12523999b5e32aeb"; // same as script hash, do not change unless new smart contract deployed.
+  "1d52d08ef9bed08243e275cd4aed59756faaf0aeb6aa8a82cf50c49d4d4aa93a"; // Represented by the assetname minted using mod.ts.
+const POLICY_ID = "9122e54b6fb6a3c21dff97a6fd2bfce960c5e459a6061144e1ccd763"; // same as script hash, do not change unless new smart contract deployed.
 const SC_ADDRESS = EnterpriseAddress.new(
   0,
   Credential.from_scripthash(ScriptHash.from_hex(POLICY_ID)),
@@ -136,6 +136,7 @@ const input = {
           minting_key: ADMIN_KEY_HASH,
           //Policy, assetName (can be empty for a wildcard) and multiplier
           acquire_multiplier: [["c82a4452eaebccb82aced501b3c94d3662cf6cd2915ad7148b459aec",undefined, 1], ["","",2]],
+          ada_distribution: [["c82a4452eaebccb82aced501b3c94d3662cf6cd2915ad7148b459aec",undefined, 1000000]],
           ada_pair_multipler: 2
         } satisfies Datum1,
         shape: {

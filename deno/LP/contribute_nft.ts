@@ -14,7 +14,10 @@ import { getUtxos } from "../lib-js.ts";
 import customer from "../wallets/customer.json";
 // 1 wallet = admin.json
 import admin from "../wallets/admin.json";
-import type { Datum, Redeemer } from "../type.ts"; 
+import type { Datum, Redeemer } from "../type.ts";
+import scriptHashes from "../script-hashes.json" with { type: "json" };
+import vaultParams from "./vault-parameters.json" with { type: "json" };
+
 const X_API_KEY = "testnet_4Y4K4wORt4fK5TQyHeoRiqAvw7DFeuAzayhlvtG5";
 const API_ENDPOINT = "https://preprod.api.ada-anvil.app/v2/services";
 
@@ -24,16 +27,14 @@ const headers = {
 };
 
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
-const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
+const ADMIN_KEY_HASH = admin.key_hash;
 
-const CONTRIBUTION_SCRIPT_HASH = "9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2";
-const VAULT_ID = "d18912e96a3196e26be360f5ecf3496a5a0d65978a4794182717059c227215b9";
-const LAST_UPDATE_TX_HASH =
-  "e3ec1002af0d332abd907e6d57b63c3f51a20b7556f30cd1042774affeee6308";
-const LAST_UPDATE_TX_INDEX = 0; // The index off the output in the transaction
+const CONTRIBUTION_SCRIPT_HASH = vaultParams.contribution_parametized_hash;
+const VAULT_ID = vaultParams.vault_id;
+const LAST_UPDATE_TX_HASH = vaultParams.last_update_tx_hash;
+const LAST_UPDATE_TX_INDEX = vaultParams.last_update_tx_index;
+const ASSET_CONTRIBUTION_UNIT = "c82a4452eaebccb82aced501b3c94d3662cf6cd2915ad7148b459aec41584f";
 
-const ASSET_CONTRIBUTION_UNIT =
-  "c82a4452eaebccb82aced501b3c94d3662cf6cd2915ad7148b459aec41584f";
 const index = async () => {
   const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
  

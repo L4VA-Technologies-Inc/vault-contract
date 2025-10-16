@@ -1,9 +1,14 @@
 import { Buffer } from "node:buffer";
-import { 
+import {
   Address,
+  EnterpriseAddress,
+  ScriptHash,
+  Credential,
   FixedTransaction,
   PrivateKey,
   PlutusData,
+  PlutusList,
+  BigInt as CSLBigInt,
 } from "@emurgo/cardano-serialization-lib-nodejs";
 
 import {
@@ -16,7 +21,11 @@ import {
 import customer from "../wallets/customer.json";
 // 1 wallet = admin.json
 import admin from "../wallets/admin.json";
-import type { Datum, Redeemer, Redeemer1 } from "../type.ts"; 
+import type { Datum, Redeemer, Redeemer1 } from "../type.ts";
+import scriptHashes from "../script-hashes.json" with { type: "json" };
+import vaultParams from "./vault-parameters.json" with { type: "json" };
+import { applyDispatchParameters } from "./dispatch-helper.ts";
+
 const X_API_KEY = "testnet_4Y4K4wORt4fK5TQyHeoRiqAvw7DFeuAzayhlvtG5";
 const API_ENDPOINT = "https://preprod.api.ada-anvil.app/v2/services";
 
@@ -28,23 +37,40 @@ const headers = {
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
 const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
 
-const CONTRIBUTION_SCRIPT_HASH = "9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2";
-  const VAULT_ID =
-  "d18912e96a3196e26be360f5ecf3496a5a0d65978a4794182717059c227215b9"; // The vault ID, used to identify the vault in the smart contract.
-const LAST_UPDATE_TX_HASH =
-  "e3ec1002af0d332abd907e6d57b63c3f51a20b7556f30cd1042774affeee6308";
-const LAST_UPDATE_TX_INDEX = 0; // The index off the output in the transaction
+const CONTRIBUTION_SCRIPT_HASH = vaultParams.contribution_parametized_hash; 
+const VAULT_ID = vaultParams.vault_id; // The vault ID, used to identify the vault in the smart contract.
+const LAST_UPDATE_TX_HASH = vaultParams.last_update_tx_hash;
+const LAST_UPDATE_TX_INDEX = vaultParams.last_update_tx_index;
 
 const TX_HASH_INDEX_WITH_LPS_TO_COLLECT =
-  "14be5cd83da9b23ac53be08e16eda17c9d9c4cb2a7de22c647e3453d5d4a35cd#0";
+  "0a755f8e8f80a82d881258d7ce37c16dd33341c6342f638ce6d64af6babd24f9#0";
 const index = async () => {
   const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
   if (utxos.length === 0) {
     throw new Error("No UTXOs found.");
   }
 
+  // Apply parameters to dispatch script to get the correct parameterized hash
+  console.log("Applying parameters to dispatch script...");
+  const dispatchResult = await applyDispatchParameters(
+    scriptHashes.vault_policy_id,
+    vaultParams.vault_id,
+    vaultParams.contribution_parametized_hash
+  );
+
+  const PARAMETERIZED_DISPATCH_HASH = dispatchResult.parameterizedHash;
+  console.log(`Using parameterized dispatch hash: ${PARAMETERIZED_DISPATCH_HASH}`);
+
   const POLICY_ID = CONTRIBUTION_SCRIPT_HASH;
   const lpsUnit = CONTRIBUTION_SCRIPT_HASH + "72656365697074";
+
+  // Create dispatch script address using the parameterized hash
+  const DISPATCH_ADDRESS = EnterpriseAddress.new(
+    0, // preprod network
+    Credential.from_scripthash(ScriptHash.from_hex(PARAMETERIZED_DISPATCH_HASH))
+  ).to_address().to_bech32();
+
+  console.log(`Dispatch address: ${DISPATCH_ADDRESS}`);
   // Find the receipt token on the UTXO to extract lovelace from
   const [tx_hash, index] = TX_HASH_INDEX_WITH_LPS_TO_COLLECT.split("#");
   const txUtxos = await blockfrost.txsUtxos(tx_hash);
@@ -69,7 +95,7 @@ const index = async () => {
       address: string;
       assets?: object[];
       lovelace?: number;
-      datum?: { type: "inline"; value: string | Datum; shape?: object };
+      datum?: { type: "inline"; value: any; shape?: object };
     }[];
     requiredSigners: string[];
     referenceInputs: { txHash: string; index: number }[];
@@ -80,7 +106,7 @@ const index = async () => {
     network: string;
   } = {
     changeAddress: CUSTOMER_ADDRESS,
-    message: "Admin extract asset",
+    message: "Admin extract ADA and send to dispatch script",
     scriptInteractions: [
       {
         purpose: "spend",
@@ -107,7 +133,7 @@ const index = async () => {
           value: "MintVaultToken" satisfies Redeemer,
         },
       },
-      
+
     ],
     mint: [
       {
@@ -115,7 +141,7 @@ const index = async () => {
         assetName: { name: VAULT_ID, format: "hex" },
         policyId: POLICY_ID,
         type: "plutus",
-        quantity: 10000000 * 2 + 10000000 * 2 ,
+        quantity: 10000000 * 2 + 10000000 * 2,
         metadata: {},
       },
       {
@@ -139,8 +165,19 @@ const index = async () => {
         ],
         datum: {
           type: "inline",
-          value: PlutusData.new_bytes(Buffer.from(datumTag, "hex")).to_hex(),
+          value: {
+            datum_tag: datumTag,
+            ada_paid: undefined
+          },
+          shape: {
+            validatorHash: scriptHashes.dispatch_script_hash,
+            purpose: "spend"
+          },
         },
+      },
+      {
+        address: DISPATCH_ADDRESS,
+        lovelace: 10000000, // Send extracted ADA to dispatch script 
       },
     ],
     requiredSigners: [ADMIN_KEY_HASH],

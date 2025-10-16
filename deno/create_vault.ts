@@ -19,6 +19,7 @@ import customer from "./wallets/customer.json" with { type: "json" };
 // 1 wallet = admin.json
 import admin from "./wallets/admin.json" with { type: "json" };
 import type { Datum1 } from "./type.ts";
+import scriptHashes from "./script-hashes.json" with { type: "json" };
 
 const one_day = 24 * 60 * 60 * 1000;
 
@@ -33,7 +34,7 @@ const headers = {
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
 const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
 
-const POLICY_ID = "2de3551bbd703dd03d57bb4d16027a73b0501977dc830885523bb1e6"; // same as script hash, do not change unless new smart contract deployed.
+const POLICY_ID = scriptHashes.vault_policy_id; // same as script hash, do not change unless new smart contract deployed.
 const SC_ADDRESS = EnterpriseAddress.new(
   0,
   Credential.from_scripthash(ScriptHash.from_hex(POLICY_ID)),
@@ -58,7 +59,7 @@ const assetName = generate_tag_from_txhash_index(
 );
 //9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2 contribution script hash
 //0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89 contribution script with verbose
-const unparametizedScriptHash = "0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89"
+const unparametizedScriptHash = scriptHashes.contribution_script_hash
 
 // Apply parameters to the blueprint before building the transaction
 const applyParamsPayload = {
@@ -69,8 +70,8 @@ const applyParamsPayload = {
     ]
   },
   "blueprint": {
-    "title": "l4va/vault",
-    "version": "0.0.7"
+    "title": "l4va/vault-with-dispatch",
+    "version": "0.1.1"
   }
 };
 
@@ -250,7 +251,7 @@ vaultTxToSubmit.sign_and_add_vkey_signature(
   PrivateKey.from_bech32(customer.skey),
 );
 
-await sleep(30000);
+//await sleep(30000);
 
 const urlSubmit = `${API_ENDPOINT}/transactions/submit`;
 const vaultSubmitted = await fetch(urlSubmit, {
@@ -308,7 +309,7 @@ if (vaultTxHash) {
   scriptTxToSubmit.sign_and_add_vkey_signature(
     PrivateKey.from_bech32(customer.skey),
   );
-  await sleep(30000);
+  //await sleep(30000);
   const scriptSubmitted = await fetch(urlSubmit, {
     method: "POST",
     headers,

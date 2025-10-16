@@ -96,6 +96,7 @@ export interface Datum {
             };
       };
   datum_tag?: string;
+  ada_paid?: number;
 }
 export interface Datum1 {
   vault_status: number;
@@ -139,6 +140,7 @@ export interface Datum1 {
     liquidityPool: number;
   };
   acquire_multiplier?: [string, string | undefined, number][];
+  ada_distribution?: [string, string | undefined, number][];
   ada_pair_multipler?: number;
   admin: string;
   minting_key: string;

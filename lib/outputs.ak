@@ -8,7 +8,7 @@ use constant.{receipt_tag}
 use datum.{find_datum}
 use multiplier.{loop_throught_assets}
 use own_ref_tag.{compare_datum_tag, generate_datum_tag}
-use types.{AssetDatum}
+use types.{AssetDatum, OutputPayoutDatum}
 
 pub fn vt_on_output_with_correct_datum_and_owner(
   self: Transaction,
@@ -17,6 +17,7 @@ pub fn vt_on_output_with_correct_datum_and_owner(
   datum: AssetDatum,
   own_ref: OutputReference,
   multiplier: Option<List<(PolicyId, Option<AssetName>, Int)>>,
+  ada_paid: Option<Int>,
 ) {
   let amount_of_policies =
     (
@@ -47,11 +48,18 @@ pub fn vt_on_output_with_correct_datum_and_owner(
 
   let output_datum = find_datum(output, self)
   expect Some(output_datum) = output_datum
-  let output_contains_datum_tag = compare_datum_tag(output_datum, own_ref)
+  expect output_datum: OutputPayoutDatum = output_datum
+  
+  let expected_output_datum = OutputPayoutDatum {
+    datum_tag: Some(generate_datum_tag(own_ref)),
+    ada_paid: ada_paid,
+  }
+  
+  let output_contains_correct_datum = output_datum == expected_output_datum
   and {
     lp_is_on_output?,
     output_is_receiver?,
-    output_contains_datum_tag?,
+    output_contains_correct_datum?,
   }
 }
 

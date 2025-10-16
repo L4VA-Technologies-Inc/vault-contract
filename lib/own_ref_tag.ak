@@ -73,3 +73,16 @@ test compare_tag() {
 
   compare_datum_tag(hardcoded_tag, out_ref)
 }
+
+test compare_tag_prod() {
+  let out_ref =
+    OutputReference {
+      transaction_id: #"8e2576ae0465fe453c40b5466c278bebeb5bf266fd713a5b5dc0f7019d5b4d4b",
+      output_index: 0,
+    }
+
+  let hardcoded_tag =
+    #"3ba680ef14f352d6f6d02cbf369bbad3da7434ba0d043f7ff92a4e695e17de33"
+
+  compare_datum_tag(hardcoded_tag, out_ref)
+}

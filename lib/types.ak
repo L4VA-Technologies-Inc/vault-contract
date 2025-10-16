@@ -36,6 +36,7 @@ pub type VaultParams {
   acquire: Option<Acquire>,
   acquire_multiplier: Option<List<(PolicyId, Option<AssetName>, Int)>>,
   ada_pair_multipler: Option<Int>,
+  ada_distribution: Option<List<(PolicyId, Option<AssetName>, Int)>>,
   admin: VerificationKeyHash,
   minting_key: VerificationKeyHash,
 }
@@ -72,4 +73,15 @@ pub type AssetDatum {
   asset_name: AssetName,
   owner: Address,
   datum_tag: Option<ByteArray>,
+}
+
+pub type OutputPayoutDatum {
+  datum_tag: Option<ByteArray>,
+  ada_paid: Option<Int>,
+}
+
+pub type DispatchRedeemer {
+  Split
+  Merge
+  Pay
 }

@@ -14,7 +14,10 @@ import {
 import customer from "../wallets/customer.json";
 // 1 wallet = admin.json
 import admin from "../wallets/admin.json";
-import type { Datum, Redeemer, Redeemer1 } from "../type.ts"; 
+import type { Datum, Redeemer, Redeemer1 } from "../type.ts";
+import scriptHashes from "../script-hashes.json" with { type: "json" };
+import vaultParams from "./vault-parameters.json" with { type: "json" };
+
 const X_API_KEY = "testnet_4Y4K4wORt4fK5TQyHeoRiqAvw7DFeuAzayhlvtG5";
 const API_ENDPOINT = "https://preprod.api.ada-anvil.app/v2/services";
 
@@ -25,10 +28,9 @@ const headers = {
 
 const CUSTOMER_ADDRESS = customer.base_address_preprod; 
  
-const CONTRIBUTION_SCRIPT_HASH = "9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2"; 
-const LAST_UPDATE_TX_HASH =
-  "8d2f016aa13d1a7cb52e70a16b374216044cef4f71acb6fbd38a90f9b52b2b77";
-const LAST_UPDATE_TX_INDEX = 0; // The index off the output in the transaction
+const CONTRIBUTION_SCRIPT_HASH = vaultParams.contribution_parametized_hash; 
+const LAST_UPDATE_TX_HASH = vaultParams.last_update_tx_hash;
+const LAST_UPDATE_TX_INDEX = vaultParams.last_update_tx_index;
 
 const TX_HASH_INDEX_WITH_CONTRIBUTION_TO_CANCEL =
   "c42fd892a2cd11f2461af5b5a46a8872b041070537051949fa5a49249cf8eeca#0";

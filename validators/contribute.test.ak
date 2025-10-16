@@ -10,7 +10,7 @@ use own_ref_tag.{generate_datum_tag}
 use types.{
   Asset, AssetDatum, CancelAda, CancelAsset, CancelContribution,
   CollectVaultToken, Contribute, ExtractAda, ExtractAsset, Lovelace,
-  MintVaultToken, VaultParams,
+  MintVaultToken, OutputPayoutDatum, VaultParams,
 }
 
 const output_reference =
@@ -56,6 +56,7 @@ const datum =
     admin: test_signer,
     minting_key: test_signer,
     ada_pair_multipler: Some(10),
+    ada_distribution: None,
   }
 
 const vault_open =
@@ -75,6 +76,7 @@ const vault_open =
     admin: test_signer,
     minting_key: test_signer,
     ada_pair_multipler: Some(10),
+    ada_distribution: None,
   }
 
 const vault_cancelled =
@@ -94,6 +96,7 @@ const vault_cancelled =
     admin: test_signer,
     minting_key: test_signer,
     ada_pair_multipler: Some(10),
+    ada_distribution: None,
   }
 
 const vault_id = #"99999999"
@@ -131,7 +134,7 @@ const reference_input_cancelled =
     },
   }
 
-test contribute_to_vault_ada() {
+test contribute_ada_success() {
   let redeemer = Contribute { output_index: 0, contribution: Lovelace }
   let mint = zero |> add(policy_id, receipt_tag, 1)
 
@@ -162,7 +165,7 @@ test contribute_to_vault_ada() {
   )?
 }
 
-test contribute_to_vault_ada_out_of_acquire_window() fail {
+test contribute_ada_out_of_window_fails() fail {
   let redeemer = Contribute { output_index: 0, contribution: Lovelace }
   let mint = zero |> add(policy_id, receipt_tag, 1)
 
@@ -193,7 +196,7 @@ test contribute_to_vault_ada_out_of_acquire_window() fail {
   )?
 }
 
-test contribute_to_vault_ada_burn_lp() fail {
+test contribute_ada_burn_lp_fails() fail {
   let redeemer = Contribute { output_index: 0, contribution: Lovelace }
   let mint = zero |> add(policy_id, receipt_tag, -1)
 
@@ -224,7 +227,7 @@ test contribute_to_vault_ada_burn_lp() fail {
   )?
 }
 
-test contribute_to_vault_nft() {
+test contribute_asset_success() {
   let redeemer = Contribute { output_index: 0, contribution: Asset }
   let mint = zero |> add(policy_id, receipt_tag, 1)
 
@@ -257,7 +260,7 @@ test contribute_to_vault_nft() {
   )?
 }
 
-test contribute_to_vault_nft_out_of_acquire_window() fail {
+test contribute_asset_out_of_window_fails() fail {
   let redeemer = Contribute { output_index: 0, contribution: Asset }
   let mint = zero |> add(policy_id, receipt_tag, 1)
 
@@ -290,7 +293,7 @@ test contribute_to_vault_nft_out_of_acquire_window() fail {
   )?
 }
 
-test contribute_to_vault_nft_without_locking_lps() fail {
+test contribute_asset_without_locking_lps_fails() fail {
   let redeemer = Contribute { output_index: 0, contribution: Asset }
   let mint = zero |> add(policy_id, receipt_tag, 1)
 
@@ -323,7 +326,7 @@ test contribute_to_vault_nft_without_locking_lps() fail {
   )?
 }
 
-test mint_ada_pair() {
+test contribute_mint_ada_pair_success() {
   let mint_redeemer = MintVaultToken
   let spend_redeemer = ExtractAda { vault_token_output_index: Some(0) }
   let mint =
@@ -350,7 +353,7 @@ test mint_ada_pair() {
       Output {
         address: owner,
         value: zero |> add(policy_id, vault_id, 200000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]
@@ -386,7 +389,7 @@ test mint_ada_pair() {
   }
 }
 
-test mint_ada_pair_with_claimed_lps() {
+test contribute_mint_ada_pair_with_claimed_lps_success() {
   let mint_redeemer = MintVaultToken
   let spend_redeemer = ExtractAda { vault_token_output_index: None }
   let mint = zero |> add(policy_id, vault_id, 1000000000)
@@ -437,7 +440,7 @@ test mint_ada_pair_with_claimed_lps() {
   }
 }
 
-test extract_asset_with_lps() {
+test contribute_extract_asset_with_lps_success() {
   let spend_redeemer = ExtractAsset { vault_token_output_index: Some(0) }
   let mint_redeemer = MintVaultToken
   let mint =
@@ -465,7 +468,7 @@ test extract_asset_with_lps() {
       Output {
         address: owner,
         value: zero |> add(policy_id, vault_id, 100000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]
@@ -501,7 +504,7 @@ test extract_asset_with_lps() {
   }
 }
 
-test extract_asset_with_claimed_lps() {
+test contribute_extract_asset_with_claimed_lps_success() {
   let spend_redeemer = ExtractAsset { vault_token_output_index: None }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -539,7 +542,7 @@ test extract_asset_with_claimed_lps() {
   )?
 }
 
-test collect_lps_with_ada() {
+test contribute_collect_lps_with_ada_success() {
   let spend_redeemer =
     CollectVaultToken { vault_token_output_index: 0, change_output_index: 1 }
   let output_datum =
@@ -567,7 +570,7 @@ test collect_lps_with_ada() {
       Output {
         address: owner,
         value: zero |> add(policy_id, vault_id, 200000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
       Output {
@@ -610,7 +613,7 @@ test collect_lps_with_ada() {
   }
 }
 
-test cancel_ada_contribution() {
+test contribute_cancel_ada_success() {
   let spend_redeemer = CancelAda { cancel_output_index: None }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -637,7 +640,7 @@ test cancel_ada_contribution() {
         address: owner,
         value: zero
           |> add(#"", "", 100000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]
@@ -673,7 +676,7 @@ test cancel_ada_contribution() {
   }
 }
 
-test cancel_asset_contribution() {
+test contribute_cancel_asset_success() {
   let spend_redeemer = CancelAsset { cancel_output_index: None }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -700,7 +703,7 @@ test cancel_asset_contribution() {
         address: owner,
         value: zero
           |> add(#"1234", "12", 1),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]
@@ -736,7 +739,7 @@ test cancel_asset_contribution() {
   }
 }
 
-test cancel_ada_contribution_admin() {
+test contribute_cancel_ada_admin_success() {
   let spend_redeemer = CancelAda { cancel_output_index: Some(0) }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -799,7 +802,7 @@ test cancel_ada_contribution_admin() {
   }
 }
 
-test cancel_ada_contribution_admin_wrong_owner() fail {
+test contribute_cancel_ada_admin_wrong_owner_fails() fail {
   let spend_redeemer = CancelAda { cancel_output_index: Some(0) }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -826,7 +829,7 @@ test cancel_ada_contribution_admin_wrong_owner() fail {
         address: script_address,
         value: zero
           |> add(#"", "", 100000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]
@@ -862,7 +865,7 @@ test cancel_ada_contribution_admin_wrong_owner() fail {
   }
 }
 
-test cancel_ada_contribution_admin_vault_open() fail {
+test contribute_cancel_ada_admin_vault_open_fails() fail {
   let spend_redeemer = CancelAda { cancel_output_index: Some(0) }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -889,7 +892,7 @@ test cancel_ada_contribution_admin_vault_open() fail {
         address: script_address,
         value: zero
           |> add(#"", "", 100000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]
@@ -925,7 +928,7 @@ test cancel_ada_contribution_admin_vault_open() fail {
   }
 }
 
-test cancel_ada_contribution_admin_no_receipt_burning() fail {
+test contribute_cancel_ada_admin_no_receipt_burning_fails() fail {
   let spend_redeemer = CancelAda { cancel_output_index: Some(0) }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -950,7 +953,7 @@ test cancel_ada_contribution_admin_no_receipt_burning() fail {
         address: owner,
         value: zero
           |> add(#"", "", 100000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]
@@ -986,7 +989,7 @@ test cancel_ada_contribution_admin_no_receipt_burning() fail {
   }
 }
 
-test cancel_ada_contribution_admin_wrong_amount_burned() fail {
+test contribute_cancel_ada_admin_wrong_amount_burned_fails() fail {
   let spend_redeemer = CancelAda { cancel_output_index: Some(0) }
   let output_datum =
     AssetDatum { policy_id, asset_name: vault_id, owner, datum_tag: Some(tag) }
@@ -1013,7 +1016,7 @@ test cancel_ada_contribution_admin_wrong_amount_burned() fail {
         address: owner,
         value: zero
           |> add(#"", "", 100000000),
-        datum: InlineDatum(tag),
+        datum: InlineDatum(OutputPayoutDatum { datum_tag: Some(tag), ada_paid: None }),
         reference_script: None,
       },
     ]

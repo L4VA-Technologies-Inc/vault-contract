@@ -48,9 +48,10 @@ const datum =
     admin: test_signer,
     minting_key: test_signer,
     ada_pair_multipler: None,
+    ada_distribution: None,
   }
 
-test mint_validator_perfect_flow() {
+test vault_mint_perfect_flow_success() {
   let first_input =
     Input {
       output_reference,
@@ -81,7 +82,7 @@ test mint_validator_perfect_flow() {
   vault.vault.mint(redeemer, policy_id, self)?
 }
 
-test mint_invalid_tag() fail {
+test vault_mint_invalid_tag_fails() fail {
   let first_input =
     Input {
       output_reference,
@@ -109,10 +110,10 @@ test mint_invalid_tag() fail {
       mint: mint,
       outputs: [output],
     }
-  vault.vault.mint(redeemer, policy_id, self)?
+  vault.vault.mint(redeemer, policy_id, self)
 }
 
-test mint_validator_with_random_mint() {
+test vault_mint_with_random_mint_success() {
   let first_input =
     Input {
       output_reference,
@@ -150,7 +151,7 @@ test mint_validator_with_random_mint() {
   vault.vault.mint(redeemer, policy_id, self)?
 }
 
-test mint_validator_more_than_one() fail {
+test vault_mint_more_than_one_fails() fail {
   let first_input =
     Input {
       output_reference,
@@ -185,10 +186,10 @@ test mint_validator_more_than_one() fail {
       mint: mint,
       outputs: [output],
     }
-  vault.vault.mint(redeemer, policy_id, self)?
+  vault.vault.mint(redeemer, policy_id, self)
 }
 
-test spend_update_settings() {
+test vault_spend_update_settings_success() {
   let first_input =
     Input {
       output_reference,
@@ -222,7 +223,7 @@ test spend_update_settings() {
   vault.vault.spend(Some(datum), redeemer, output_reference, self)?
 }
 
-test spend_update_settings_without_admin_signature() fail {
+test vault_spend_update_settings_without_admin_signature_fails() fail {
   let first_input =
     Input {
       output_reference,
@@ -253,10 +254,10 @@ test spend_update_settings_without_admin_signature() fail {
       outputs: [output],
       extra_signatories: [],
     }
-  vault.vault.spend(Some(datum), redeemer, output_reference, self)?
+  vault.vault.spend(Some(datum), redeemer, output_reference, self)
 }
 
-test spend_submit_to_another_address() fail {
+test vault_spend_submit_to_another_address_fails() fail {
   let first_input =
     Input {
       output_reference,
@@ -287,10 +288,10 @@ test spend_submit_to_another_address() fail {
       outputs: [output],
       extra_signatories: [],
     }
-  vault.vault.spend(Some(datum), redeemer, output_reference, self)?
+  vault.vault.spend(Some(datum), redeemer, output_reference, self)
 }
 
-test spend_with_no_datum_output() fail {
+test vault_spend_with_no_datum_output_fails() fail {
   let first_input =
     Input {
       output_reference,
@@ -321,10 +322,10 @@ test spend_with_no_datum_output() fail {
       outputs: [output],
       extra_signatories: [],
     }
-  vault.vault.spend(Some(datum), redeemer, output_reference, self)?
+  vault.vault.spend(Some(datum), redeemer, output_reference, self)
 }
 
-test spend_and_burn() {
+test vault_spend_and_burn_success() {
   let first_input =
     Input {
       output_reference,
@@ -362,7 +363,7 @@ test spend_and_burn() {
   }
 }
 
-test spend_update_and_burn() {
+test vault_spend_update_and_burn_success() {
   let first_input =
     Input {
       output_reference,
@@ -422,7 +423,7 @@ test spend_update_and_burn() {
   }
 }
 
-test spend_and_burn_and_mint() fail {
+test vault_spend_and_burn_and_mint_fails() fail {
   let first_input =
     Input {
       output_reference,
@@ -456,12 +457,12 @@ test spend_and_burn_and_mint() fail {
       extra_signatories: [],
     }
   and {
-    vault.vault.spend(Some(datum), redeemer, output_reference, self)?,
-    vault.vault.mint(redeemer, policy_id, self)?,
+    vault.vault.spend(Some(datum), redeemer, output_reference, self),
+    vault.vault.mint(redeemer, policy_id, self),
   }
 }
 
-test spend_double_burn() {
+test vault_spend_double_burn_success() {
   let first_input =
     Input {
       output_reference,
@@ -513,7 +514,7 @@ test spend_double_burn() {
   }
 }
 
-test mint_validator_perfect_flow_tqueri() {
+test vault_mint_perfect_flow_tqueri_success() {
   let tq_output_ref =
     OutputReference {
       transaction_id: #"9acffdbf5042f8cc544a8141a7e60eff9d328db4064a20a17f5b0645ab2a0569",

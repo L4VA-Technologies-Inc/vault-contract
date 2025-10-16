@@ -1,0 +1,9 @@
+{
+  "vault_id": "1d52d08ef9bed08243e275cd4aed59756faaf0aeb6aa8a82cf50c49d4d4aa93a",
+  "contribution_parametized_hash": "914d92782cbe657a4d79d944180389b6f499a16d1ba7597efe3ced73",
+  "last_update_tx_hash": "5a44a02a1e5cf5e5e7cd5c90a93fc49e783bf1ea769904b4f594d605cf0b9a90",
+  "last_update_tx_index": 0,
+  "dispatch_utxo_tx_hash": "23024de51835f61e237ab3f711b7dc25350d271531221d3a85262fe2c3cb6f81",
+  "dispatch_utxo_index": 1,
+  "dispatch_script_hash": "88546bb4efcf64f7915dfffa33328d766e4ac10ac9f56651e37cd551"
+}

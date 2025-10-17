@@ -10,9 +10,7 @@ import {
 
 import { getUtxos } from "../lib-js.ts";
 
-// 1 wallet = customer.json
 import customer from "../wallets/customer.json";
-// 1 wallet = admin.json
 import admin from "../wallets/admin.json";
 import type { Datum, Redeemer } from "../type.ts";
 import scriptHashes from "../script-hashes.json" with { type: "json" };
@@ -36,7 +34,7 @@ const LAST_UPDATE_TX_INDEX = vaultParams.last_update_tx_index;
 const ASSET_CONTRIBUTION_UNIT = "c82a4452eaebccb82aced501b3c94d3662cf6cd2915ad7148b459aec41584f";
 
 const index = async () => {
-  const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
+  const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS));
  
   if (utxos.length === 0) {
     throw new Error("No UTXOs found.");

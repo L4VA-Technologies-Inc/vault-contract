@@ -10,9 +10,7 @@ import {
   blockfrost,
 } from "../lib-js.ts";
 
-// 1 wallet = customer.json
 import customer from "../wallets/customer.json";
-// 1 wallet = admin.json
 import admin from "../wallets/admin.json";
 import type { Datum, Redeemer, Redeemer1 } from "../type.ts";
 import scriptHashes from "../script-hashes.json" with { type: "json" };
@@ -35,14 +33,13 @@ const LAST_UPDATE_TX_INDEX = vaultParams.last_update_tx_index;
 const TX_HASH_INDEX_WITH_CONTRIBUTION_TO_CANCEL =
   "c42fd892a2cd11f2461af5b5a46a8872b041070537051949fa5a49249cf8eeca#0";
 const index = async () => {
-  const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
+  const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS));
   if (utxos.length === 0) {
     throw new Error("No UTXOs found.");
   }
 
   const POLICY_ID = CONTRIBUTION_SCRIPT_HASH;
   const lpsUnit = CONTRIBUTION_SCRIPT_HASH + "72656365697074";
-  // Find the receipt token on the UTXO to cancel contribution
   const [tx_hash, index] = TX_HASH_INDEX_WITH_CONTRIBUTION_TO_CANCEL.split("#");
   const txUtxos = await blockfrost.txsUtxos(tx_hash);
   const output = txUtxos.outputs[index];

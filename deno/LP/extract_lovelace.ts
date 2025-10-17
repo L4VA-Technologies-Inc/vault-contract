@@ -17,9 +17,7 @@ import {
   generate_tag_from_txhash_index,
 } from "../lib-js.ts";
 
-// 1 wallet = customer.json
 import customer from "../wallets/customer.json";
-// 1 wallet = admin.json
 import admin from "../wallets/admin.json";
 import type { Datum, Redeemer, Redeemer1 } from "../type.ts";
 import scriptHashes from "../script-hashes.json" with { type: "json" };
@@ -35,17 +33,17 @@ const headers = {
 };
 
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
-const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
+const ADMIN_KEY_HASH = admin.key_hash;
 
 const CONTRIBUTION_SCRIPT_HASH = vaultParams.contribution_parametized_hash; 
-const VAULT_ID = vaultParams.vault_id; // The vault ID, used to identify the vault in the smart contract.
+const VAULT_ID = vaultParams.vault_id;
 const LAST_UPDATE_TX_HASH = vaultParams.last_update_tx_hash;
 const LAST_UPDATE_TX_INDEX = vaultParams.last_update_tx_index;
 
 const TX_HASH_INDEX_WITH_LPS_TO_COLLECT =
   "0a755f8e8f80a82d881258d7ce37c16dd33341c6342f638ce6d64af6babd24f9#0";
 const index = async () => {
-  const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
+  const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS));
   if (utxos.length === 0) {
     throw new Error("No UTXOs found.");
   }

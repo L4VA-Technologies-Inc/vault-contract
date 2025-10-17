@@ -14,9 +14,7 @@ import {
   toHex,
 } from "./lib.ts";
 
-// 1 wallet = customer.json
 import customer from "./wallets/customer.json" with { type: "json" };
-// 1 wallet = admin.json
 import admin from "./wallets/admin.json" with { type: "json" };
 import type { Datum1 } from "./type.ts";
 import scriptHashes from "./script-hashes.json" with { type: "json" };
@@ -32,9 +30,9 @@ const headers = {
 };
 
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
-const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
+const ADMIN_KEY_HASH = admin.key_hash;
 
-const POLICY_ID = scriptHashes.vault_policy_id; // same as script hash, do not change unless new smart contract deployed.
+const POLICY_ID = scriptHashes.vault_policy_id;
 const SC_ADDRESS = EnterpriseAddress.new(
   0,
   Credential.from_scripthash(ScriptHash.from_hex(POLICY_ID)),
@@ -44,9 +42,9 @@ const SC_ADDRESS = EnterpriseAddress.new(
 const POLICIES_ALLOWED_IN_THE_VAULT = [
   "b28533ab183e0146552d8d97a6111e7ec56afa389d76357cf2b3feff",
   "c82a4452eaebccb82aced501b3c94d3662cf6cd2915ad7148b459aec"
-]; // testnet baby sneklet, can be anything, represents the allow assets in the vault
+];
 
-const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
+const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS));
 if (utxos.len() === 0) {
   throw new Error("No UTXOs found.");
 }
@@ -57,16 +55,14 @@ const assetName = generate_tag_from_txhash_index(
   selectedUtxo.input().transaction_id().to_hex(),
   selectedUtxo.input().index(),
 );
-//9a9b0bc93c26a40952aaff525ac72a992a77ebfa29012c9cb4a72eb2 contribution script hash
-//0f9d90277089b2f442bef581dcc1d333a92c3fedf688700c4e39ab89 contribution script with verbose
 const unparametizedScriptHash = scriptHashes.contribution_script_hash
 
 // Apply parameters to the blueprint before building the transaction
 const applyParamsPayload = {
   "params": {
     [unparametizedScriptHash]: [
-      POLICY_ID, // policy id of the vault
-      assetName  // newly created vault id from generate_tag_from_txhash_index
+      POLICY_ID,
+      assetName
     ]
   },
   "blueprint": {
@@ -89,9 +85,7 @@ if (!applyParamsResult.preloadedScript) {
   throw new Error("Failed to apply parameters to blueprint");
 }
 
-// Step 2: Upload the parameterized script to /blueprints
 console.log("Uploading parameterized script to /blueprints...");
-console.log("Assetname: ", assetName)
 const uploadScriptResponse = await fetch(`${API_ENDPOINT}/blueprints`, {
   method: "POST",
   headers,
@@ -171,12 +165,10 @@ const vaultInput: {
       datum: {
         type: "inline",
         value: {
-          vault_status: 1, //  0: pending, 1: open, 2: successful, 3: cancelled
-          contract_type: 0, // Represent an enum setup by L4VA (0: PRIVATE | 1: PUBLIC | 2: SEMI_PRIVATE)
+          vault_status: 1,
+          contract_type: 0,
           asset_whitelist: POLICIES_ALLOWED_IN_THE_VAULT,
-          // contributor_whitelist: [],
           asset_window: {
-            // Time allowed to upload NFT
             lower_bound: {
               bound_type: new Date().getTime(),
               is_inclusive: true,
@@ -187,7 +179,6 @@ const vaultInput: {
             },
           },
           acquire_window: {
-            // Time allowed to upload ADA
             lower_bound: {
               bound_type: new Date().getTime(),
               is_inclusive: true,
@@ -197,29 +188,9 @@ const vaultInput: {
               is_inclusive: true,
             },
           },
-          valuation_type: 1, // Enum 0: 'FIXED' 1: 'LBE'
-          // fractionalization: {
-          //   percentage: 1,
-          //   token_supply: 1,
-          //   token_decimals: 1,
-          //   token_policy: "",
-          // },
+          valuation_type: 1,
           custom_metadata: [
-            // <Data,Data>
-            // [
-            //   PlutusData.new_bytes(Buffer.from("foo")).to_hex(),
-            //   PlutusData.new_bytes(Buffer.from("bar")).to_hex(),
-            // ], 
-          ], // like a tuple
-
-          // termination: {
-          //   termination_type: 1,
-          //   fdp: 1,
-          // },
-          // acquire: {
-          //   reserve: 1,
-          //   liquidityPool: 1,
-          // },
+          ],
           admin: ADMIN_KEY_HASH,
           minting_key: ADMIN_KEY_HASH
         },
@@ -270,7 +241,7 @@ console.log("Vault submission result:", vaultOutput);
 const { txHash: vaultTxHash } = vaultOutput;
 
 if (vaultTxHash) {
-  console.log("✅ Vault created successfully!");
+  console.log("Vault created successfully!");
   console.log(`Vault ID: ${assetName}`);
   console.log(`Vault Transaction Hash: ${vaultTxHash}`);
 
@@ -326,7 +297,7 @@ if (vaultTxHash) {
   const { txHash: scriptTxHash } = scriptOutput;
 
   if (scriptTxHash) {
-    console.log("✅ Script uploaded successfully!");
+    console.log("Script uploaded successfully!");
     console.log(`Script Transaction Hash: ${scriptTxHash}`);
 
     // Step 3: Update blueprint with the script transaction reference
@@ -359,7 +330,7 @@ if (vaultTxHash) {
     const blueprintUpdateResult = await blueprintUpdate.json();
     console.log("Blueprint update result:", JSON.stringify(blueprintUpdateResult, null, 2));
    
-    console.log("✅ Complete two-transaction workflow finished!");
+    console.log("Complete two-transaction workflow finished!");
     console.log(`Vault created with ID: ${assetName} (tx: ${vaultTxHash})`);
     console.log(`Script uploaded with hash: ${scriptHash} (tx: ${scriptTxHash})`);
     console.log("Blueprint updated with script reference");

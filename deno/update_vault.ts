@@ -10,9 +10,7 @@ import {
 
 import { getUtxos, getVaultUtxo, toHex } from "./lib.ts";
 
-// 1 wallet = customer.json
 import customer from "./wallets/customer.json" with { type: "json" };
-// 1 wallet = admin.json
 import admin from "./wallets/admin.json" with { type: "json" };
 import { Datum1 } from "./type.ts";
 
@@ -27,11 +25,11 @@ const headers = {
 const one_day = 24 * 60 * 60 * 1000;
 
 const CUSTOMER_ADDRESS = customer.base_address_preprod;
-const ADMIN_KEY_HASH = admin.key_hash; // The keyhash of the generated private key to manage the vault
+const ADMIN_KEY_HASH = admin.key_hash;
 
 const VAULT_ID =
-  "1d52d08ef9bed08243e275cd4aed59756faaf0aeb6aa8a82cf50c49d4d4aa93a"; // Represented by the assetname minted using mod.ts.
-const POLICY_ID = "9122e54b6fb6a3c21dff97a6fd2bfce960c5e459a6061144e1ccd763"; // same as script hash, do not change unless new smart contract deployed.
+  "1d52d08ef9bed08243e275cd4aed59756faaf0aeb6aa8a82cf50c49d4d4aa93a";
+const POLICY_ID = "9122e54b6fb6a3c21dff97a6fd2bfce960c5e459a6061144e1ccd763";
 const SC_ADDRESS = EnterpriseAddress.new(
   0,
   Credential.from_scripthash(ScriptHash.from_hex(POLICY_ID)),
@@ -41,9 +39,9 @@ const SC_ADDRESS = EnterpriseAddress.new(
 const POLICIES_ALLOWED_IN_THE_VAULT = [
   "f7f5a12b681be1a2c02054414a726fefadd47e24b0343cd287c0283d",
   "c82a4452eaebccb82aced501b3c94d3662cf6cd2915ad7148b459aec"
-]; // funplastic, can be anything, represents the allow assets in the vault
+];
 
-const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS)); // Any UTXO works.
+const utxos = await getUtxos(Address.from_bech32(CUSTOMER_ADDRESS));
 if (utxos.len() === 0) {
   throw new Error("No UTXOs found.");
 }

@@ -3,6 +3,7 @@
     "@blaze-cardano/uplc": "^0.3.0",
     "@blockfrost/blockfrost-js": "^6.0.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^14.1.0",
+    "bip39": "^3.1.0",
     "dotenv": "^16.5.0"
   }
 }

@@ -43,7 +43,7 @@ const headers = {
 // From vault info database
 const CONTRIBUTION_SCRIPT_HASH = "d50976ea6f14605f0a2b5d3864d58b361beedf1bcddb57af4cf29da1"; 
 
-// Reference to vault parameters UTXO (from last_update_tx_hash and last_update_tx_index in DB)
+// Reference to vault parameters UTXO 
 const LAST_UPDATE_TX_HASH = "d203e828b4a87039340fe983e3b606c53a23f6dda16ef80ff5f171c6c76fbf97";
 const LAST_UPDATE_TX_INDEX = 0;
 
@@ -52,7 +52,6 @@ const ASSET_POLICY_ID = "d50976ea6f14605f0a2b5d3864d58b361beedf1bcddb57af4cf29da
 const ASSET_HEX_NAME = "682afc977d12f606b2f9048d8c9a9f33f369b2f21038f3fedb9b1205d60c74c9";
 const AMOUNT_TO_BURN = 948200000000; 
 
-// Admin wallet address
 const index = async () => {
   // Fetch UTXOs containing the LP tokens to burn
   const {utxos} = await getUtxosExtract(
@@ -66,9 +65,6 @@ const index = async () => {
   }
   
   console.log(`Found ${utxos.length} UTXOs with LP tokens to burn`);
-
-  // The minting_key from VaultParams datum - this is the admin key that must sign
-  const MINTING_KEY_HASH = "1efdbaf9fdc114c5484efae76fa9261864c002934ae87821164fbd70";
 
   const input = {
     changeAddress: customer.base_address_preprod,
@@ -131,7 +127,6 @@ const index = async () => {
   console.log("Transaction built successfully!");
   console.log("Transaction ID will be available after submission.");
 
-  // Sign the transaction using CSL.
   const txToSubmitOnChain = FixedTransaction.from_bytes(
     Buffer.from(transaction.complete, "hex")
   );

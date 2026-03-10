@@ -60,3 +60,54 @@ if (vkeys) {
     console.log(`  ${i}: ${vkey.vkey().public_key().hash().to_hex()}`);
   }
 }
+
+// Metadata (Auxiliary Data)
+const auxData = tx.auxiliary_data();
+if (auxData) {
+  console.log('\n=== METADATA ===');
+  const metadata = auxData.metadata();
+  if (metadata) {
+    const keys = metadata.keys();
+    for (let i = 0; i < keys.len(); i++) {
+      const key = keys.get(i);
+      const value = metadata.get(key);
+      console.log(`\nLabel ${key.to_str()}:`);
+      
+      // Recursively decode metadata structure
+      const decodeMetadata = (metadatum) => {
+        const kind = metadatum.kind();
+        
+        if (kind === 0) { // Map
+          const map = metadatum.as_map();
+          const result = {};
+          const mapKeys = map.keys();
+          for (let j = 0; j < mapKeys.len(); j++) {
+            const k = mapKeys.get(j);
+            const v = map.get(k);
+            result[decodeMetadata(k)] = decodeMetadata(v);
+          }
+          return result;
+        } else if (kind === 1) { // List
+          const list = metadatum.as_list();
+          const result = [];
+          for (let j = 0; j < list.len(); j++) {
+            result.push(decodeMetadata(list.get(j)));
+          }
+          return result;
+        } else if (kind === 2) { // Int
+          return metadatum.as_int().to_str();
+        } else if (kind === 3) { // Bytes
+          return Buffer.from(metadatum.as_bytes()).toString('hex');
+        } else if (kind === 4) { // Text
+          return metadatum.as_text();
+        }
+        return null;
+      };
+      
+      console.log(JSON.stringify(decodeMetadata(value), null, 2));
+    }
+  }
+} else {
+  console.log('\n=== NO METADATA ===');
+}
+

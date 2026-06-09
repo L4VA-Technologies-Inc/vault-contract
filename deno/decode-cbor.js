@@ -41,6 +41,32 @@ for (let i = 0; i < outputs.len(); i++) {
 // Fee
 console.log(`\nFEE: ${body.fee().to_str()} lovelace`);
 
+// Validity Interval (Time Limits)
+console.log('\n=== TIME VALIDITY ===');
+const ttl = body.ttl();
+const ttlValue = ttl ? (typeof ttl.to_str === 'function' ? ttl.to_str() : ttl.toString()) : null;
+if (ttlValue) {
+  console.log(`TTL (Time to Live): Slot ${ttlValue}`);
+} else {
+  console.log('TTL (Time to Live): Not set');
+}
+
+const validityStart = body.validity_start_interval();
+const validityStartValue = validityStart ? (typeof validityStart.to_str === 'function' ? validityStart.to_str() : validityStart.toString()) : null;
+if (validityStartValue) {
+  console.log(`Validity Start: Slot ${validityStartValue}`);
+} else {
+  console.log('Validity Start: Not set');
+}
+
+if (ttlValue || validityStartValue) {
+  console.log('\nNote: Slots are blockchain time units (~1 second on Cardano mainnet)');
+  if (validityStartValue && ttlValue) {
+    const duration = parseInt(ttlValue) - parseInt(validityStartValue);
+    console.log(`Valid for: ${duration} slots (~${Math.floor(duration / 60)} minutes)`);
+  }
+}
+
 // Required Signers
 const reqSigners = body.required_signers();
 if (reqSigners) {
